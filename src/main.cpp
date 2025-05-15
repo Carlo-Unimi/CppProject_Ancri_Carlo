@@ -17,7 +17,6 @@
 #include "GAPSolver.h"
 #include "UFLPSolver.h"
 
-
 #include "ProblemInstance.h"
 #include "ProblemSolution.h"
 #include "ProblemSolver.h"
@@ -108,6 +107,25 @@ std::shared_ptr<ProblemSolver> CreateProblemSolver(int problem) {
     }
 }
 
+bool checkIfRightInstance(const int& currentProblem, std::string& filename) {
+    if (filename.empty()) return false; // se la stringa è vuota
+
+    std::ifstream infile(filename);
+    if (!infile.is_open()) return false; // se il file è inesistente
+
+    std::string line;
+
+    getline(infile, line);
+    infile.close();
+
+    switch(currentProblem) {
+        case 1: return line[6] == 'A';
+        case 2: return line[6] == 'G';
+        case 3: return line[6] == 'U';
+        default: return false;
+    }
+}
+
 
 int main() {
     int currentProblem = 0;
@@ -148,12 +166,16 @@ int main() {
             std::cout << "Select the istance's file name: ";
             std::string filename;
             std::cin >> filename;
-
-            instance = CreateProblemInstance(currentProblem, filename);
-            solver = CreateProblemSolver(currentProblem);
-            solution = solver->solve(instance.get());
+            if (checkIfRightInstance(currentProblem, filename)) { // se il file selezionato è effettivamente del tipo giusto
+                instance = CreateProblemInstance(currentProblem, filename);
+                solver = CreateProblemSolver(currentProblem);
+                solution = solver->solve(instance.get());
             
-            std::cout << "Instance imported and resolved successfully.\n";
+                std::cout << "Instance imported and resolved successfully.\n";
+            } else { // se non è del tipo giusto
+                std::cout << "[ERROR] Wrong type of instance, retry.\n";
+            }
+            
             std::this_thread::sleep_for(std::chrono::seconds(2));
             break;
         }
@@ -166,14 +188,13 @@ int main() {
                 std::cout << *solution;
             }
             std::cout << "Press enter to continue...";
-            std::cin.ignore(); std::cin.get();
+            std::cin.ignore(); 
+            std::cin.get();
             break;
         }
         case 4: {
             if (!solution) {
                 std::cout << "[ERROR] No solution to export.\n";
-                std::cout << "Press enter to continue...";
-                std::cin.ignore(); std::cin.get();
             } else {
                 std::cout << "\nInsert the output file name: ";
                 std::string outfile;
@@ -181,7 +202,7 @@ int main() {
                 std::ofstream ofs(outfile);
                 ofs << *solution;
                 ofs.close();
-                std::cout << "Solution exported in " << outfile << ".\n";
+                std::cout << "Solution exported in: " << outfile << ".\n";
             }
             std::cout << "Press enter to continue...";
             std::cin.ignore(); std::cin.get();
