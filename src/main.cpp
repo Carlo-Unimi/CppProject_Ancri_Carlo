@@ -1,11 +1,8 @@
 #include <iostream>
-#include <memory>
 #include <string>
 #include <thread>
 #include <chrono>
 #include <fstream>
-#include <cstdio>
-#include <stdlib.h>
 #include <vector>
 #include <limits>
 
@@ -34,6 +31,7 @@ void printMainMenu() {
       << "Choose an option: ";
 }
 
+// legge un valore da tastiera finchè non è un numero
 int safeReadInt() {
     int choice;
     while (true) {
