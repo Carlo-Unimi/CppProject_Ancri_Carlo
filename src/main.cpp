@@ -1,0 +1,201 @@
+#include <iostream>
+#include <memory>
+#include <string>
+#include <thread>
+#include <chrono>
+#include <fstream>
+#include <cstdio>
+#include <stdlib.h>
+#include <vector>
+#include <limits>
+
+#include "APInstance.h"
+#include "GAPInstance.h"
+#include "UFLPInstance.h"
+
+#include "APSolver.h"
+#include "GAPSolver.h"
+#include "UFLPSolver.h"
+
+
+#include "ProblemInstance.h"
+#include "ProblemSolution.h"
+#include "ProblemSolver.h"
+
+
+// prints the menu
+void printMainMenu() {
+    std::cout
+      << " ============ MENU ============\n"
+      << "1) Select problem (AP, GAP, UFLP)\n"
+      << "2) Import instance and solve it\n"
+      << "3) Print solution\n"
+      << "4) Export solution to a file\n"
+      << "5) Exit the program\n"
+      << "Choose an option: ";
+}
+
+int safeReadInt() {
+    int choice;
+    while (true) {
+        if (std::cin >> choice) {
+            return choice;
+        } else {
+            std::cout << "[ERROR] Non valid input.\nOption: ";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+    }
+}
+
+// clears the terminal after given delay
+void clearScreen(int seconds) {
+    if (seconds > 0) {
+        std::this_thread::sleep_for(std::chrono::seconds(seconds));
+    }
+  #ifdef _WIN32
+    std::system("cls");
+  #else
+    std::system("clear");
+  #endif
+}
+
+// funzione generale che crea un'istanza del problema scelto
+std::shared_ptr<ProblemInstance> CreateProblemInstance(int problem, const std::string& filename) {
+    std::shared_ptr<ProblemInstance> instance;
+
+    try {
+        switch (problem) {
+        case 1:
+            instance = std::make_shared<APInstance>();
+            break;
+        case 2:
+            instance = std::make_shared<GAPInstance>();
+            break;
+        case 3:
+            instance = std::make_shared<UFLPInstance>();
+            break;
+        default:
+            std::cerr << "[ERROR] Non valid problem.\n";
+            return nullptr;
+        }
+        
+        std::ifstream infile(filename);
+        if (!infile.is_open()) {
+            std::cerr << "[ERROR] Unable to open file: " << filename << "\n";
+            return nullptr;
+        }
+        instance->loadFromFile(filename);
+        infile.close();
+
+    } catch (const std::exception& e) {
+        std::cerr << "[ERROR] Error loading file: " << e.what() << "\n";
+        return nullptr;
+    }
+    return instance;
+}
+
+std::shared_ptr<ProblemSolver> CreateProblemSolver(int problem) {
+    switch (problem) {
+        case 1:
+            return std::make_shared<APSolver>();
+        case 2:
+            return std::make_shared<GAPSolver>();
+        case 3:
+            return std::make_shared<UFLPSolver>();
+        default:
+            throw std::invalid_argument("Tipo di problema non valido in CreateProblemSolver");
+    }
+}
+
+
+int main() {
+    int currentProblem = 0;
+    int running = 1;
+    std::shared_ptr<ProblemInstance> instance;
+    std::shared_ptr<ProblemSolution> solution;
+    std::shared_ptr<ProblemSolver> solver;
+
+    while (running) {
+        clearScreen(0);
+        printMainMenu();
+        int op = safeReadInt();
+
+        switch (op) {
+        case 1: {
+            clearScreen(0);
+            std::cout << "Choose problem:\n"
+                      << "  1) Assignment Problem (AP)\n"
+                      << "  2) Generalized Assignment Problem (GAP)\n"
+                      << "  3) Uncapacitated Facility Location (UFLP)\n"
+                      << "Option: ";
+            int p = safeReadInt();
+            if (p >= 1 && p <= 3) {
+                currentProblem = p;
+                std::cout << "Current problem selected: " << p << ".\n";
+            } else {
+                std::cout << "[ERROR] Problem not recognized. Return to main menu.\n";
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+            break;
+        }
+        case 2: {
+            if (currentProblem == 0) {
+                std::cout << "[ERROR] First select a problem (option 1).\n";
+                std::this_thread::sleep_for(std::chrono::seconds(2));
+                break;
+            }
+            std::cout << "Select the istance's file name: ";
+            std::string filename;
+            std::cin >> filename;
+
+            instance = CreateProblemInstance(currentProblem, filename);
+            solver = CreateProblemSolver(currentProblem);
+            solution = solver->solve(instance.get());
+            
+            std::cout << "Instance imported and resolved successfully.\n";
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+            break;
+        }
+        case 3: {
+            
+            if (!solution) {
+                std::cout << "[ERROR] No solution available. Please resolve an instance first.\n";
+            } else {
+                clearScreen(0);
+                std::cout << *solution;
+            }
+            std::cout << "Press enter to continue...";
+            std::cin.ignore(); std::cin.get();
+            break;
+        }
+        case 4: {
+            if (!solution) {
+                std::cout << "[ERROR] No solution to export.\n";
+                std::cout << "Press enter to continue...";
+                std::cin.ignore(); std::cin.get();
+            } else {
+                std::cout << "\nInsert the output file name: ";
+                std::string outfile;
+                std::cin >> outfile;
+                std::ofstream ofs(outfile);
+                ofs << *solution;
+                ofs.close();
+                std::cout << "Solution exported in " << outfile << ".\n";
+            }
+            std::cout << "Press enter to continue...";
+            std::cin.ignore(); std::cin.get();
+            break;
+        }
+        case 5:
+            running = 0;
+            break;
+        default:
+            std::cout << "[ERROR] Non-existent option. Retry.\n";
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+        }
+    }
+
+    std::cout << "\nProgram terminated.\n";
+    return 0;
+}
