@@ -13,11 +13,10 @@ private:
 public:
     void loadFromFile(const std::string& filename);
 
-    // Getter per eventuali metodi di soluzione o stampa
     const std::vector<std::vector<int>>& getCostMatrix() const;
     int getNumAgents() const;
     int getNumTasks() const;
 
 };
 
-#endif // APINSTANCE_H
+#endif
