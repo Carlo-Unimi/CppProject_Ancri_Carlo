@@ -3,17 +3,7 @@
 
 GAPSolution::GAPSolution() : totalCost(0) {}
 
-void GAPSolution::setAssignment(const std::vector<int>& assign) {
-    assignment = assign;
-}
-
-const std::vector<int>& GAPSolution::getAssignment() const {
-    return assignment;
-}
-
-void GAPSolution::computeResourcesAndCost(
-    const std::vector<std::vector<int>>& cost,
-    const std::vector<std::vector<int>>& resource) {
+void GAPSolution::computeResourcesAndCost(const std::vector<std::vector<int>>& cost, const std::vector<std::vector<int>>& resource) {
     totalCost = 0;
     capacityUsed.assign(resource.size(), 0);
     for (size_t j = 0; j < assignment.size(); ++j) {
@@ -21,14 +11,6 @@ void GAPSolution::computeResourcesAndCost(
         totalCost += cost[agent][j];
         capacityUsed[agent] += resource[agent][j];
     }
-}
-
-int GAPSolution::getTotalCost() const {
-    return totalCost;
-}
-
-const std::vector<int>& GAPSolution::getCapacityUsed() const {
-    return capacityUsed;
 }
 
 void GAPSolution::print(std::ostream& os) const {
@@ -42,4 +24,20 @@ void GAPSolution::print(std::ostream& os) const {
     for (size_t i = 0; i < capacityUsed.size(); ++i) {
         os << "Agent " << i << " : " << capacityUsed[i] << "\n";
     }
+}
+
+void GAPSolution::setAssignment(const std::vector<int>& assign) {
+    assignment = assign;
+}
+
+const std::vector<int>& GAPSolution::getAssignment() const {
+    return assignment;
+}
+
+int GAPSolution::getTotalCost() const {
+    return totalCost;
+}
+
+const std::vector<int>& GAPSolution::getCapacityUsed() const {
+    return capacityUsed;
 }

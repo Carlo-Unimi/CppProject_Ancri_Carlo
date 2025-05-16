@@ -6,8 +6,8 @@
 
 class GAPSolution : public ProblemSolution {
 private:
-    std::vector<int> assignment; // assignment[j] = agente a cui è assegnato il task j
-    std::vector<int> capacityUsed; // capacityUsed[i] = risorsa usata dall'agente i
+    std::vector<int> assignment;
+    std::vector<int> capacityUsed;
     int totalCost;
 
 protected:
