@@ -19,9 +19,7 @@ public:
     void setAssignment(const std::vector<int>& assign);
     const std::vector<int>& getAssignment() const;
 
-    void computeResourcesAndCost(
-        const std::vector<std::vector<int>>& cost,
-        const std::vector<std::vector<int>>& resource);
+    void computeResourcesAndCost(const std::vector<std::vector<int>>& cost, const std::vector<std::vector<int>>& resource);
     int getTotalCost() const;
     const std::vector<int>& getCapacityUsed() const;
 };
