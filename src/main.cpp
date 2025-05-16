@@ -148,6 +148,7 @@ int main() {
             int p = safeReadInt();
             if (p >= 1 && p <= 3) {
                 currentProblem = p;
+                solver = CreateProblemSolver(currentProblem);
                 std::cout << "Current problem selected: " << p << ".\n";
             } else {
                 std::cout << "[ERROR] Problem not recognized. Return to main menu.\n";
@@ -166,7 +167,6 @@ int main() {
             std::cin >> filename;
             if (checkIfRightInstance(currentProblem, filename)) { // se il file selezionato è effettivamente del tipo giusto
                 instance = CreateProblemInstance(currentProblem, filename);
-                solver = CreateProblemSolver(currentProblem);
                 solution = solver->solve(instance.get());
             
                 std::cout << "Instance imported and resolved successfully.\n";
