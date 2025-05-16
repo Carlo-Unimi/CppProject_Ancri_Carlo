@@ -3,7 +3,6 @@
 
 #include "ProblemInstance.h"
 #include <vector>
-#include <ostream>
 
 class GAPInstance : public ProblemInstance {
 private:
@@ -16,7 +15,6 @@ private:
 public:
     void loadFromFile(const std::string& filename) override;
 
-    // Getter
     const std::vector<std::vector<int>>& getCostMatrix() const;
     const std::vector<std::vector<int>>& getResourceMatrix() const;
     const std::vector<int>& getCapacities() const;
@@ -25,4 +23,4 @@ public:
 
 };
 
-#endif // GAPINSTANCE_H
+#endif
