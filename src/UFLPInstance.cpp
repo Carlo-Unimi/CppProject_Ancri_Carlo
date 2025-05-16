@@ -6,75 +6,48 @@
 
 void UFLPInstance::loadFromFile(const std::string& filename) {
     std::ifstream infile(filename);
-    if (!infile.is_open()) {
-        throw std::runtime_error("Unable to open file: " + filename);
-    }
-
+    if (!infile.is_open())
+        throw std::runtime_error("Impossible to open file: " + filename);
+    
     std::string line;
-    bool readingService = false;
-    bool readingOpening = false;
-    int currentRow = 0;
+    int m = 0, n = 0;
 
     while (std::getline(infile, line)) {
-        if (line.empty()) continue;
-        // trim leading spaces
-        size_t start = line.find_first_not_of(" \t");
-        if (start == std::string::npos) continue;
-        line = line.substr(start);
-
-        if (line.rfind("m:", 0) == 0) {
-            std::istringstream ss(line.substr(2));
-            ss >> numFacilities;
-            continue;
+        if (line.find("m:") == 0) {
+            std::istringstream(line.substr(2)) >> m;
+        } else if (line.find("n:") == 0) {
+            std::istringstream(line.substr(2)) >> n;
         }
-        if (line.rfind("n:", 0) == 0) {
-            std::istringstream ss(line.substr(2));
-            ss >> numClients;
-            serviceCosts.resize(numFacilities);
-            continue;
-        }
-        if (line.find("c_ij:") != std::string::npos) {
-            readingService = true;
-            readingOpening = false;
-            currentRow = 0;
-            continue;
-        }
-        if (line.find("f_i:") != std::string::npos) {
-            readingService = false;
-            readingOpening = true;
+        if (m > 0 && n > 0) {
+            numFacilities = m;
+            numClients = n;
+            serviceCosts.assign(m, std::vector<int>(n));
             openingCosts.clear();
-            continue;
+            break;
         }
-        if (readingService) {
-            if (currentRow >= numFacilities) break;
+
+        while (std::getline(infile, line) && line.find("c_ij:") == std::string::npos);
+        for (int i=0; i<m; ++i) {
+            if (!std::getline(infile, line))
+                throw std::runtime_error("Missing rows in costs matrix.");
             std::istringstream ss(line);
-            int v;
-            while (ss >> v) {
-                serviceCosts[currentRow].push_back(v);
-            }
-            if (serviceCosts[currentRow].size() != static_cast<size_t>(numClients)) {
-                throw std::runtime_error("Wrong number of columns in row " + std::to_string(currentRow));
-            }
-            ++currentRow;
-        } else if (readingOpening) {
-            std::istringstream ss(line);
-            int v;
-            while (ss >> v) {
-                openingCosts.push_back(v);
+            for (int j=0; j<n; ++j) {
+                if (!(ss >> serviceCosts[i][j]))
+                    throw std::runtime_error("Error reading costs matrix at row:" + std::to_string(i));
             }
         }
     }
 
-    // Validazioni finali
-    if (serviceCosts.size() != static_cast<size_t>(numFacilities)) {
-        throw std::runtime_error("Number of serviceCosts rows different from m");
-    }
-    if (openingCosts.size() != static_cast<size_t>(numFacilities)) {
-        throw std::runtime_error("Number of openingCosts elements different from m");
-    }
+    while (std::getline(infile, line) && line.find("f_i:") == std::string::npos);
+    getline(infile, line);
+    std::istringstream ss(line);
+    int cost;
+    while (ss >> cost) openingCosts.push_back(cost);
+
+    if ((int)openingCosts.size() != m)
+        throw std::runtime_error("Number of opening cost != m.");
 }
 
-// Getter implementations
 int UFLPInstance::getNumFacilities() const {
     return numFacilities;
 }
