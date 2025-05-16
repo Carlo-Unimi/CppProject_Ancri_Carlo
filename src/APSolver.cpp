@@ -7,36 +7,35 @@
 #include "APSolution.h"
 
 std::shared_ptr<ProblemSolution> APSolver::solve(const ProblemInstance* instance) {
-    const APInstance* apInst = dynamic_cast<const APInstance*>(instance);
-    if (!apInst) {
-        throw std::invalid_argument("You need to create an Instance first.");
-    }
+    auto apInstance = dynamic_cast<const APInstance*>(instance);
 
-    const auto& costMatrix = apInst->getCostMatrix();
-    int n = apInst->getNumAgents();  // agenti = tasks
+    const auto& costMatrix = apInstance->getCostMatrix();
+    int n = apInstance->getNumAgents();
 
-    // assegna a ogni agente il task libero a costo minimo
-    std::vector<bool> usedTask(n, false);
+    std::vector<bool> used(n, false);
     std::vector<int> assignment(n, -1);
 
-    for (int i = 0; i < n; ++i) {
-        int bestTask = -1;
+    for (int i=0; i<n; ++i) {
+        int bestT = -1;
         int bestCost = std::numeric_limits<int>::max();
-        for (int j = 0; j < n; ++j) {
-            if (!usedTask[j] && costMatrix[i][j] < bestCost) {
+
+        for (int j=0; j<n; ++j) {
+            if (!used[j] && costMatrix[i][j]<bestCost) {
                 bestCost = costMatrix[i][j];
-                bestTask = j;
+                bestT = j;
             }
         }
-        if (bestTask < 0) {
-            throw std::runtime_error("APSolver: impossibile trovare task disponibile per agente " + std::to_string(i));
-        }
-        assignment[i] = bestTask;
-        usedTask[bestTask] = true;
+
+        if (bestT < 0)
+            throw std::runtime_error("Couldn't find a free task for agent " + std::to_string(i));
+        
+        assignment[i] = bestT;
+        used[bestT] = true;
     }
 
     auto solution = std::make_shared<APSolution>();
     solution->setAssignment(assignment);
     solution->computeCost(costMatrix);
+
     return solution;
 }
