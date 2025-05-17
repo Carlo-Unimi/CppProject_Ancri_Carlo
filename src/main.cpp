@@ -193,7 +193,7 @@ int main() {
                 clearScreen(0);
                 std::cout << *solution;
             }
-            std::cout << "Press a key to continue...";
+            std::cout << "Press enter to continue...";
             std::cin.ignore(); 
             std::cin.get();
             break;
