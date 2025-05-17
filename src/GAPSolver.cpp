@@ -6,7 +6,7 @@
 #include <limits>
 #include <vector>
 
-std::shared_ptr<ProblemSolution> GAPSolver::solve(const ProblemInstance* instance) {
+std::unique_ptr<ProblemSolution> GAPSolver::solve(const ProblemInstance* instance) {
     const GAPInstance* gapInstance = dynamic_cast<const GAPInstance*>(instance);
 
     int m = gapInstance->getNumAgents();
@@ -34,7 +34,7 @@ std::shared_ptr<ProblemSolution> GAPSolver::solve(const ProblemInstance* instanc
         resid[bestAgent] -= resource[bestAgent][i];
     }
 
-    auto solution = std::make_shared<GAPSolution>();
+    auto solution = std::make_unique<GAPSolution>();
     solution->setAssignment(assignment);
     solution->computeResourcesAndCost(cost, resource);
     return solution;

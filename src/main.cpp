@@ -58,19 +58,19 @@ void clearScreen(int seconds) {
 }
 
 // funzione generale che crea un'istanza del problema scelto
-std::shared_ptr<ProblemInstance> CreateProblemInstance(int problem, const std::string& filename) {
-    std::shared_ptr<ProblemInstance> instance;
+std::unique_ptr<ProblemInstance> CreateProblemInstance(int problem, const std::string& filename) {
+    std::unique_ptr<ProblemInstance> instance;
 
     try {
         switch (problem) {
         case 1:
-            instance = std::make_shared<APInstance>();
+            instance = std::make_unique<APInstance>();
             break;
         case 2:
-            instance = std::make_shared<GAPInstance>();
+            instance = std::make_unique<GAPInstance>();
             break;
         case 3:
-            instance = std::make_shared<UFLPInstance>();
+            instance = std::make_unique<UFLPInstance>();
             break;
         default:
             std::cerr << "[ERROR] Non valid problem.\n";
@@ -92,14 +92,14 @@ std::shared_ptr<ProblemInstance> CreateProblemInstance(int problem, const std::s
     return instance;
 }
 
-std::shared_ptr<ProblemSolver> CreateProblemSolver(int problem) {
+std::unique_ptr<ProblemSolver> CreateProblemSolver(int problem) {
     switch (problem) {
         case 1:
-            return std::make_shared<APSolver>();
+            return std::make_unique<APSolver>();
         case 2:
-            return std::make_shared<GAPSolver>();
+            return std::make_unique<GAPSolver>();
         case 3:
-            return std::make_shared<UFLPSolver>();
+            return std::make_unique<UFLPSolver>();
         default:
             throw std::invalid_argument("Tipo di problema non valido in CreateProblemSolver");
     }
@@ -127,9 +127,9 @@ bool checkIfRightInstance(const int& currentProblem, std::string& filename) {
 
 int main() {
     int currentProblem = 0, running = 1;
-    std::shared_ptr<ProblemInstance> instance;
-    std::shared_ptr<ProblemSolution> solution;
-    std::shared_ptr<ProblemSolver> solver;
+    std::unique_ptr<ProblemInstance> instance;
+    std::unique_ptr<ProblemSolution> solution;
+    std::unique_ptr<ProblemSolver> solver;
 
     while (running) {
         clearScreen(0);
@@ -169,15 +169,9 @@ int main() {
             std::string filename;
             std::cin >> filename;
             if (checkIfRightInstance(currentProblem, filename)) {
-                try {
-                    instance = CreateProblemInstance(currentProblem, filename);
-                    solution = solver->solve(instance.get());
-                    std::cout << "Instance imported and resolved successfully.\n";
-                } catch (const std::runtime_error& e) {
-                    std::cout << "[ERROR]: " << e.what() << "\n";
-                    instance = nullptr;
-                    solution = nullptr;
-                }
+                instance = CreateProblemInstance(currentProblem, filename);
+                solution = solver->solve(instance.get());
+                std::cout << "Instance imported and resolved successfully.\n";
             } else { // se non è del tipo giusto
                 std::cout << "[ERROR] Wrong type of instance, retry.\n";
             }

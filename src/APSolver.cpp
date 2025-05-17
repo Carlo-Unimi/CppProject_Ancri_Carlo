@@ -6,7 +6,7 @@
 #include "APInstance.h"
 #include "APSolution.h"
 
-std::shared_ptr<ProblemSolution> APSolver::solve(const ProblemInstance* instance) {
+std::unique_ptr<ProblemSolution> APSolver::solve(const ProblemInstance* instance) {
     auto apInstance = dynamic_cast<const APInstance*>(instance);
 
     const auto& costMatrix = apInstance->getCostMatrix();
@@ -33,7 +33,7 @@ std::shared_ptr<ProblemSolution> APSolver::solve(const ProblemInstance* instance
         used[bestT] = true;
     }
 
-    auto solution = std::make_shared<APSolution>();
+    auto solution = std::make_unique<APSolution>();
     solution->setAssignment(assignment);
     solution->computeCost(costMatrix);
 

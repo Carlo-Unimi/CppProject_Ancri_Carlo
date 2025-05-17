@@ -8,7 +8,7 @@
 
 class ProblemSolver {
 public:
-    virtual std::shared_ptr<ProblemSolution> solve(const ProblemInstance* instance) = 0;
+    virtual std::unique_ptr<ProblemSolution> solve(const ProblemInstance* instance) = 0;
     virtual ~ProblemSolver() = default;
 };
 

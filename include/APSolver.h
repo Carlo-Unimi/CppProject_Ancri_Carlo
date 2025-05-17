@@ -5,7 +5,7 @@
 
 class APSolver : public ProblemSolver {
 public:
-    std::shared_ptr<ProblemSolution> solve(const ProblemInstance* instance) override;
+    std::unique_ptr<ProblemSolution> solve(const ProblemInstance* instance) override;
 };
 
 #endif
