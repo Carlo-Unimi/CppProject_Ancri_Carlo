@@ -126,8 +126,7 @@ bool checkIfRightInstance(const int& currentProblem, std::string& filename) {
 
 
 int main() {
-    int currentProblem = 0;
-    int running = 1;
+    int currentProblem = 0, running = 1;
     std::shared_ptr<ProblemInstance> instance;
     std::shared_ptr<ProblemSolution> solution;
     std::shared_ptr<ProblemSolver> solver;
@@ -147,6 +146,10 @@ int main() {
                       << "Option: ";
             int p = safeReadInt();
             if (p >= 1 && p <= 3) {
+                if (currentProblem != p) {
+                    instance = nullptr;
+                    solution = nullptr;
+                }
                 currentProblem = p;
                 solver = CreateProblemSolver(currentProblem);
                 std::cout << "Current problem selected: " << p << ".\n";
@@ -165,11 +168,16 @@ int main() {
             std::cout << "Select the istance's file name: ";
             std::string filename;
             std::cin >> filename;
-            if (checkIfRightInstance(currentProblem, filename)) { // se il file selezionato è effettivamente del tipo giusto
-                instance = CreateProblemInstance(currentProblem, filename);
-                solution = solver->solve(instance.get());
-            
-                std::cout << "Instance imported and resolved successfully.\n";
+            if (checkIfRightInstance(currentProblem, filename)) {
+                try {
+                    instance = CreateProblemInstance(currentProblem, filename);
+                    solution = solver->solve(instance.get());
+                    std::cout << "Instance imported and resolved successfully.\n";
+                } catch (const std::runtime_error& e) {
+                    std::cout << "[ERROR]: " << e.what() << "\n";
+                    instance = nullptr;
+                    solution = nullptr;
+                }
             } else { // se non è del tipo giusto
                 std::cout << "[ERROR] Wrong type of instance, retry.\n";
             }
@@ -185,7 +193,7 @@ int main() {
                 clearScreen(0);
                 std::cout << *solution;
             }
-            std::cout << "Press enter to continue...";
+            std::cout << "Press a key to continue...";
             std::cin.ignore(); 
             std::cin.get();
             break;
