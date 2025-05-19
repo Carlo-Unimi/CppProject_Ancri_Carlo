@@ -5,6 +5,16 @@
 #include <stdexcept>
 #include <limits>
 #include <vector>
+#include <time.h>
+#include <cstdlib>
+
+void GAPSolver::shuffleIndex(std::vector<int>& index) {
+    srand(time(NULL));
+    for (size_t i = 0; i < index.size(); ++i) {
+        int j = rand() % index.size();
+        std::swap(index[i], index[j]);
+    }
+}
 
 std::unique_ptr<ProblemSolution> GAPSolver::solve(const ProblemInstance* instance) {
     const GAPInstance* gapInstance = dynamic_cast<const GAPInstance*>(instance);
@@ -18,21 +28,7 @@ std::unique_ptr<ProblemSolution> GAPSolver::solve(const ProblemInstance* instanc
     std::vector<int> resid = capacity;
     std::vector<int> assignment(n, -1);
 
-    for (int i=0; i<n; ++i) {
-        int bestAgent = -1, bestCost = std::numeric_limits<int>::max();
-        for (int j=0; j<m; ++j) {
-            if (resource[j][i] <= resid[j] && cost[j][i] < bestCost) {
-                bestCost = cost[j][i];
-                bestAgent = j;
-            }
-        }
-
-        if (bestAgent == -1)
-            throw std::runtime_error("Couldn't assign task: "+ std::to_string(i));
-        
-        assignment[i] = bestAgent;
-        resid[bestAgent] -= resource[bestAgent][i];
-    }
+    
 
     auto solution = std::make_unique<GAPSolution>();
     solution->setAssignment(assignment);
