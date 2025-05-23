@@ -9,4 +9,4 @@ public:
     virtual ~ProblemInstance() = default;
 };
 
-#endif // PROBLEMINSTANCE_H
+#endif
