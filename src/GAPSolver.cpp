@@ -7,6 +7,7 @@
 #include <vector>
 #include <time.h>
 #include <cstdlib>
+#include <algorithm>
 
 void GAPSolver::shuffleIndex(std::vector<int>& index) {
     srand(time(NULL));
@@ -17,21 +18,23 @@ void GAPSolver::shuffleIndex(std::vector<int>& index) {
 }
 
 std::unique_ptr<ProblemSolution> GAPSolver::solve(const ProblemInstance* instance) {
-    const GAPInstance* gapInstance = dynamic_cast<const GAPInstance*>(instance);
+    const GAPInstance* gapInst = dynamic_cast<const GAPInstance*>(instance);
+    if (!gapInst) 
+        throw std::invalid_argument("GAPSolver::solve richiede un GAPInstance valido");
 
-    int m = gapInstance->getNumAgents();
-    int n = gapInstance->getNumTasks();
-    const auto& cost = gapInstance->getCostMatrix();
-    const auto& resource = gapInstance->getResourceMatrix();
-    const auto& capacity = gapInstance->getCapacities();
+    int m = gapInst->getNumAgents();
+    int n = gapInst->getNumTasks();
+    const auto& cost = gapInst->getCostMatrix();
+    const auto& resource = gapInst->getResourceMatrix();
+    const auto& capacity = gapInst->getCapacities();
 
-    std::vector<int> resid = capacity;
-    std::vector<int> assignment(n, -1);
+    std::vector<int> agentIndex(m);
+    for (int i = 0; i < m; ++i) agentIndex[i] = i;
+
+
+
+
+
 
     
-
-    auto solution = std::make_unique<GAPSolution>();
-    solution->setAssignment(assignment);
-    solution->computeResourcesAndCost(cost, resource);
-    return solution;
 }
