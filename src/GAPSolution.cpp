@@ -13,7 +13,7 @@ void GAPSolution::computeResourcesAndCost(const std::vector<std::vector<int>>& c
     }
 }
 
-void GAPSolution::print(std::ostream& os) const {
+std::ostream &GAPSolution::print(std::ostream& os) const {
     os << "GAP Solution:\n";
     os << "Total Cost: " << totalCost << "\n";
     os << "Assignment (task -> agent):\n";
@@ -24,6 +24,7 @@ void GAPSolution::print(std::ostream& os) const {
     for (size_t i = 0; i < capacityUsed.size(); ++i) {
         os << "Agent " << i << " : " << capacityUsed[i] << "\n";
     }
+    return os;
 }
 
 void GAPSolution::setAssignment(const std::vector<int>& assign) {

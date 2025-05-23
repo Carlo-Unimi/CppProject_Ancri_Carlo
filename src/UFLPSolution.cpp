@@ -35,7 +35,7 @@ int UFLPSolution::getTotalCost() const {
     return totalCost;
 }
 
-void UFLPSolution::print(std::ostream& os) const {
+std::ostream &UFLPSolution::print(std::ostream& os) const {
     os << "UFLP Solution:\n";
     os << "Total Cost: " << totalCost << "\n";
     os << "Open Facilities:\n";
@@ -46,4 +46,5 @@ void UFLPSolution::print(std::ostream& os) const {
     for (size_t j = 0; j < assignment.size(); ++j) {
         os << "Client " << j << " -> Facility " << assignment[j] << "\n";
     }
+    return os;
 }

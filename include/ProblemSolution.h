@@ -7,8 +7,7 @@
 class ProblemSolution {
 protected:
     // Stampa la soluzione sullo stream; implementata nelle sottoclassi
-    virtual void print(std::ostream& os) const = 0;
-
+    virtual std::ostream &print(std::ostream &) const = 0;
 public:
     virtual ~ProblemSolution() = default;
 

@@ -11,7 +11,7 @@ private:
     int totalCost;
 
 protected:
-    void print(std::ostream& os) const override;
+    std::ostream &print(std::ostream &) const override;
 
 public:
     GAPSolution();
