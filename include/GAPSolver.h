@@ -6,8 +6,6 @@
 #include "ProblemSolver.h"
 
 class GAPSolver : public ProblemSolver {
-private:
-    void shuffleIndex(std::vector<int>& index);
 public:
     std::unique_ptr<ProblemSolution> solve(const ProblemInstance* instance) override;
 };
