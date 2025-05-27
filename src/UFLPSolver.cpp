@@ -1,83 +1,93 @@
 #include "UFLPSolver.h"
 #include "UFLPInstance.h"
 #include "UFLPSolution.h"
-
-#include <stdexcept>
-#include <limits>
+#include <memory>
 #include <vector>
+#include <limits>
+#include <iostream>
 #include <algorithm>
-
 std::unique_ptr<ProblemSolution> UFLPSolver::solve(const ProblemInstance* instance) {
-    // 1. Cast sicuro a UFLPInstance
     const UFLPInstance* uflpInst = dynamic_cast<const UFLPInstance*>(instance);
     if (!uflpInst) {
-        throw std::invalid_argument("UFLPSolver::solve richiede un UFLPInstance valido");
+        throw std::invalid_argument("UFLPSolver::solve richiede un UFLPInstance.");
     }
 
-    // 2. Estrai dimensioni e dati
-    int m = uflpInst->getNumFacilities();  // numero depositi
-    int n = uflpInst->getNumClients();   // numero clienti
-    const auto& cost = uflpInst->getServiceCosts();      // m x n (costi trasporto)
-    const auto& fixedCost = uflpInst->getOpeningCosts(); // m (costi fissi apertura)
+    int m = uflpInst->getNumFacilities();
+    int n = uflpInst->getNumClients();
+    const auto& cost = uflpInst->getServiceCosts();     // m x n
+    const auto& openCost = uflpInst->getOpeningCosts(); // m
 
-    // 3. Inizializza strutture dati soluzione
-    std::vector<bool> facilityOpen(m, false);          // depositi aperti
-    std::vector<int> customerAssignment(n, -1);        // cliente -> deposito assegnato
-    
-    // 4. Algoritmo greedy: per ogni cliente, trova la migliore opzione
-    // Considera sia il costo di trasporto che il costo di apertura (se necessario)
-    
-    for (int j = 0; j < n; ++j) {
-        int bestFacility = -1;
-        int bestTotalCost = std::numeric_limits<int>::max();
-        
-        // 5. Per ogni deposito, calcola il costo totale per servire questo cliente
-        for (int i = 0; i < m; ++i) {
-            int totalCost = cost[i][j]; // costo trasporto
-            
-            // Se il deposito non è ancora aperto, aggiungi il costo fisso
-            if (!facilityOpen[i]) {
-                totalCost += fixedCost[i];
-            }
-            
-            // 6. Scegli il deposito con costo totale minimo
-            if (totalCost < bestTotalCost) {
-                bestTotalCost = totalCost;
-                bestFacility = i;
-            }
-        }
-        
-        // 7. Assegna il cliente al miglior deposito e aprilo se necessario
-        if (bestFacility != -1) {
-            customerAssignment[j] = bestFacility;
-            facilityOpen[bestFacility] = true;
-        } else {
-            throw std::runtime_error("UFLPSolver::solve: impossibile assegnare cliente " + std::to_string(j));
-        }
-    }
-    
-    // 8. Controlla che tutti i clienti siano assegnati (sanity check)
-    for (int j = 0; j < n; ++j) {
-        if (customerAssignment[j] == -1) {
-            throw std::runtime_error("UFLPSolver::solve: cliente non assegnato");
-        }
-    }
-    
-    // 9. Costruisci lista dei depositi aperti
-    std::vector<int> openFacilities;
+    std::vector<bool> openFacility(m, false);     // inizialmente tutte chiuse
+    std::vector<int> assignment(n, -1);
+
+    // STEP 1: apri facility iniziali con rapporto costo apertura medio
+    std::vector<std::pair<double, int>> score; // (costo medio, index)
     for (int i = 0; i < m; ++i) {
-        if (facilityOpen[i]) {
-            openFacilities.push_back(i);
+        double avgService = 0;
+        for (int j = 0; j < n; ++j)
+            avgService += cost[i][j];
+        avgService /= n;
+        score.push_back({ openCost[i] + avgService, i });
+    }
+
+    std::sort(score.begin(), score.end());  // preferisco le più convenienti
+
+    int initialOpen = std::max(1, m / 3); // apri circa un terzo
+    for (int k = 0; k < initialOpen; ++k) {
+        openFacility[score[k].second] = true;
+    }
+
+    auto computeTotalCost = [&](const std::vector<bool>& openF) -> int {
+        int total = 0;
+        for (int i = 0; i < m; ++i)
+            if (openF[i]) total += openCost[i];
+        for (int j = 0; j < n; ++j) {
+            int minC = std::numeric_limits<int>::max();
+            for (int i = 0; i < m; ++i)
+                if (openF[i])
+                    minC = std::min(minC, cost[i][j]);
+            total += minC;
+        }
+        return total;
+    };
+
+    int bestCost = computeTotalCost(openFacility);
+    bool improved = true;
+
+    // STEP 2: Local Search (apri o chiudi se migliora)
+    while (improved) {
+        improved = false;
+        for (int i = 0; i < m; ++i) {
+            std::vector<bool> trial = openFacility;
+            trial[i] = !trial[i]; // toggle
+
+            int trialCost = computeTotalCost(trial);
+            if (trialCost < bestCost) {
+                openFacility = trial;
+                bestCost = trialCost;
+                improved = true;
+                break;  // accetta subito la modifica
+            }
         }
     }
-    
-    // 10. Crea e popola la soluzione
+
+    // STEP 3: assegna ogni cliente alla facility più vicina tra quelle aperte
+    for (int j = 0; j < n; ++j) {
+        int bestI = -1;
+        int minC = std::numeric_limits<int>::max();
+        for (int i = 0; i < m; ++i) {
+            if (openFacility[i] && cost[i][j] < minC) {
+                minC = cost[i][j];
+                bestI = i;
+            }
+        }
+        assignment[j] = bestI;
+    }
+
     auto solution = std::make_unique<UFLPSolution>();
-    solution->setOpenFacilities(facilityOpen);
-    solution->setAssignment(customerAssignment);
-    
-    // 11. Calcola costi totali (se la classe UFLPSolution ha questi metodi)
-    solution->computeCost(fixedCost, cost);
-    
+    solution->setOpenFacilities(openFacility);
+    solution->setAssignment(assignment);
+    solution->computeCost(openCost, cost);
+
     return solution;
 }
