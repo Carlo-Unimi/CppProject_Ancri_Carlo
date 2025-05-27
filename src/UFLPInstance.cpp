@@ -1,8 +1,8 @@
-// src/UFLPInstance.cpp
 #include "UFLPInstance.h"
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <iostream>
 
 void UFLPInstance::loadFromFile(const std::string& filename) {
     std::ifstream infile(filename);
@@ -11,6 +11,7 @@ void UFLPInstance::loadFromFile(const std::string& filename) {
     
     std::string line;
     int m = 0, n = 0;
+    bool foundDimensions = false;
 
     while (std::getline(infile, line)) {
         if (line.find("m:") == 0) {
@@ -18,34 +19,60 @@ void UFLPInstance::loadFromFile(const std::string& filename) {
         } else if (line.find("n:") == 0) {
             std::istringstream(line.substr(2)) >> n;
         }
+        
         if (m > 0 && n > 0) {
+            foundDimensions = true;
             numFacilities = m;
             numClients = n;
             serviceCosts.assign(m, std::vector<int>(n));
             openingCosts.clear();
             break;
         }
+    }
 
-        while (std::getline(infile, line) && line.find("c_ij:") == std::string::npos);
-        for (int i=0; i<m; ++i) {
-            if (!std::getline(infile, line))
-                throw std::runtime_error("Missing rows in costs matrix.");
-            std::istringstream ss(line);
-            for (int j=0; j<n; ++j) {
-                if (!(ss >> serviceCosts[i][j]))
-                    throw std::runtime_error("Error reading costs matrix at row:" + std::to_string(i));
+    if (!foundDimensions) {
+        throw std::runtime_error("Could not find valid m and n dimensions");
+    }
+
+    while (std::getline(infile, line)) {
+        if (line.find("c_ij:") != std::string::npos) {
+            break;
+        }
+    }
+
+    for (int i = 0; i < m; ++i) {
+        if (!std::getline(infile, line)) {
+            throw std::runtime_error("Missing row " + std::to_string(i) + " in costs matrix.");
+        }
+        
+        std::istringstream ss(line);
+        for (int j = 0; j < n; ++j) {
+            if (!(ss >> serviceCosts[i][j])) {
+                throw std::runtime_error("Error reading costs matrix at row " + std::to_string(i) + ", col " + std::to_string(j));
             }
         }
     }
 
-    while (std::getline(infile, line) && line.find("f_i:") == std::string::npos);
-    getline(infile, line);
-    std::istringstream ss(line);
-    int cost;
-    while (ss >> cost) openingCosts.push_back(cost);
+    while (std::getline(infile, line)) {
+        if (line.find("f_i:") != std::string::npos) {
+            break;
+        }
+    }
 
-    if ((int)openingCosts.size() != m)
-        throw std::runtime_error("Number of opening cost != m.");
+    if (std::getline(infile, line)) {
+        std::istringstream ss(line);
+        int cost;
+        while (ss >> cost) {
+            openingCosts.push_back(cost);
+        }
+    }
+
+    if ((int)openingCosts.size() != m) {
+        throw std::runtime_error("Number of opening costs (" + std::to_string(openingCosts.size()) + 
+                                ") != m (" + std::to_string(m) + ")");
+    }
+
+    infile.close();
 }
 
 int UFLPInstance::getNumFacilities() const {
