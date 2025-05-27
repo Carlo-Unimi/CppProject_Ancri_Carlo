@@ -23,9 +23,6 @@ void UFLPSolver::sortStructure(std::vector<std::pair<double, int>>& score) {
 
 std::unique_ptr<ProblemSolution> UFLPSolver::solve(const ProblemInstance* instance) {
     const UFLPInstance* uflpInst = dynamic_cast<const UFLPInstance*>(instance);
-    if (!uflpInst) {
-        throw std::invalid_argument("UFLPSolver::solve richiede un UFLPInstance.");
-    }
 
     int m = uflpInst->getNumFacilities();
     int n = uflpInst->getNumClients();
@@ -47,9 +44,8 @@ std::unique_ptr<ProblemSolution> UFLPSolver::solve(const ProblemInstance* instan
     sortStructure(score);
 
     int initialOpen = std::max(1, m / 3);
-    for (int k = 0; k < initialOpen; ++k) {
+    for (int k = 0; k < initialOpen; ++k)
         openFacility[score[k].second] = true;
-    }
 
     auto computeTotalCost = [&](const std::vector<bool>& openF) -> int {
         int total = 0;
