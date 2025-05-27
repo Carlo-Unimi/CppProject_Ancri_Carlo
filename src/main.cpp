@@ -18,8 +18,6 @@
 #include "ProblemSolution.h"
 #include "ProblemSolver.h"
 
-
-// prints the menu
 void printMainMenu() {
     std::cout
       << " ============ MENU ============\n"
@@ -31,7 +29,6 @@ void printMainMenu() {
       << "Choose an option: ";
 }
 
-// legge un valore da tastiera finchè non è un numero
 int safeReadInt() {
     int choice;
     while (true) {
@@ -45,7 +42,6 @@ int safeReadInt() {
     }
 }
 
-// clears the terminal after given delay
 void clearScreen(int seconds) {
     if (seconds > 0) {
         std::this_thread::sleep_for(std::chrono::seconds(seconds));
@@ -57,7 +53,6 @@ void clearScreen(int seconds) {
   #endif
 }
 
-// funzione generale che crea un'istanza del problema scelto
 std::unique_ptr<ProblemInstance> CreateProblemInstance(int problem, const std::string& filename) {
     std::unique_ptr<ProblemInstance> instance;
 
@@ -106,10 +101,10 @@ std::unique_ptr<ProblemSolver> CreateProblemSolver(int problem) {
 }
 
 bool checkIfRightInstance(const int& currentProblem, std::string& filename) {
-    if (filename.empty()) return false; // se la stringa è vuota
+    if (filename.empty()) return false;
 
     std::ifstream infile(filename);
-    if (!infile.is_open()) return false; // se il file è inesistente
+    if (!infile.is_open()) return false;
 
     std::string line;
 
@@ -172,7 +167,7 @@ int main() {
                 instance = CreateProblemInstance(currentProblem, filename);
                 solution = solver->solve(instance.get());
                 std::cout << "Instance imported and resolved successfully.\n";
-            } else { // se non è del tipo giusto
+            } else {
                 std::cout << "[ERROR] Wrong type of instance, retry.\n";
             }
             
@@ -180,7 +175,6 @@ int main() {
             break;
         }
         case 3: {
-            
             if (!solution) {
                 std::cout << "[ERROR] No solution available. Please resolve an instance first.\n";
             } else {
