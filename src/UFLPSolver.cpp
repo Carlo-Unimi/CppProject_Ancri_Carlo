@@ -5,7 +5,22 @@
 #include <vector>
 #include <limits>
 #include <iostream>
-#include <algorithm>
+
+void UFLPSolver::sortStructure(std::vector<std::pair<double, int>>& score) {
+    size_t n = score.size();
+    for (size_t i = 0; i < n - 1; ++i) {
+        size_t minIndex = i;
+        for (size_t j = i + 1; j < n; ++j) {
+            if (score[j].first < score[minIndex].first) {
+                minIndex = j;
+            }
+        }
+        if (minIndex != i) {
+            std::swap(score[i], score[minIndex]);
+        }
+    }
+}
+
 std::unique_ptr<ProblemSolution> UFLPSolver::solve(const ProblemInstance* instance) {
     const UFLPInstance* uflpInst = dynamic_cast<const UFLPInstance*>(instance);
     if (!uflpInst) {
@@ -14,14 +29,13 @@ std::unique_ptr<ProblemSolution> UFLPSolver::solve(const ProblemInstance* instan
 
     int m = uflpInst->getNumFacilities();
     int n = uflpInst->getNumClients();
-    const auto& cost = uflpInst->getServiceCosts();     // m x n
-    const auto& openCost = uflpInst->getOpeningCosts(); // m
+    const auto& cost = uflpInst->getServiceCosts();
+    const auto& openCost = uflpInst->getOpeningCosts();
 
-    std::vector<bool> openFacility(m, false);     // inizialmente tutte chiuse
+    std::vector<bool> openFacility(m, false);
     std::vector<int> assignment(n, -1);
 
-    // STEP 1: apri facility iniziali con rapporto costo apertura medio
-    std::vector<std::pair<double, int>> score; // (costo medio, index)
+    std::vector<std::pair<double, int>> score;
     for (int i = 0; i < m; ++i) {
         double avgService = 0;
         for (int j = 0; j < n; ++j)
@@ -30,9 +44,9 @@ std::unique_ptr<ProblemSolution> UFLPSolver::solve(const ProblemInstance* instan
         score.push_back({ openCost[i] + avgService, i });
     }
 
-    std::sort(score.begin(), score.end());  // preferisco le più convenienti
+    sortStructure(score);
 
-    int initialOpen = std::max(1, m / 3); // apri circa un terzo
+    int initialOpen = std::max(1, m / 3);
     for (int k = 0; k < initialOpen; ++k) {
         openFacility[score[k].second] = true;
     }
@@ -54,7 +68,6 @@ std::unique_ptr<ProblemSolution> UFLPSolver::solve(const ProblemInstance* instan
     int bestCost = computeTotalCost(openFacility);
     bool improved = true;
 
-    // STEP 2: Local Search (apri o chiudi se migliora)
     while (improved) {
         improved = false;
         for (int i = 0; i < m; ++i) {
@@ -66,12 +79,11 @@ std::unique_ptr<ProblemSolution> UFLPSolver::solve(const ProblemInstance* instan
                 openFacility = trial;
                 bestCost = trialCost;
                 improved = true;
-                break;  // accetta subito la modifica
+                break;
             }
         }
     }
 
-    // STEP 3: assegna ogni cliente alla facility più vicina tra quelle aperte
     for (int j = 0; j < n; ++j) {
         int bestI = -1;
         int minC = std::numeric_limits<int>::max();
