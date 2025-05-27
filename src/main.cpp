@@ -18,6 +18,9 @@
 #include "ProblemSolution.h"
 #include "ProblemSolver.h"
 
+/**
+ * @brief Prints the main menu of the program.
+ */
 void printMainMenu() {
     std::cout
       << " ============ MENU ============\n"
@@ -29,6 +32,11 @@ void printMainMenu() {
       << "Choose an option: ";
 }
 
+/**
+ * @brief Reads an integer from the standard input, ensuring that is valid.
+ * @details This function will keep prompting the user until a valid integer is entered.ADJ_OFFSET_SINGLESHOT
+ * @return The valid integer input from the user.
+ */
 int safeReadInt() {
     int choice;
     while (true) {
@@ -42,6 +50,11 @@ int safeReadInt() {
     }
 }
 
+/**
+ * @brief Clears the console screen. (Works for both Windows and Unix-like systems)
+ * @details This function waits for a specified number of seconds before clearing the screen.
+ * @param seconds The number of seconds to wait before clearing the screen.
+ */
 void clearScreen(int seconds) {
     if (seconds > 0) {
         std::this_thread::sleep_for(std::chrono::seconds(seconds));
@@ -53,6 +66,12 @@ void clearScreen(int seconds) {
   #endif
 }
 
+/**
+ * @brief Creates a ProblemInstance based on the selected problem and loads data from a file.
+ * @param problem The type of problem (1 for AP, 2 for GAP, 3 for UFLP).
+ * @param filename The name of the file containing the instance data.
+ * @return A unique pointer to the created ProblemInstance, or nullptr if an error occurs.
+ */
 std::unique_ptr<ProblemInstance> CreateProblemInstance(int problem, const std::string& filename) {
     std::unique_ptr<ProblemInstance> instance;
 
@@ -87,6 +106,12 @@ std::unique_ptr<ProblemInstance> CreateProblemInstance(int problem, const std::s
     return instance;
 }
 
+/**
+ * @brief Creates a ProblemSolver based on the selected problem.
+ * @param problem The type of problem (1 for AP, 2 for GAP, 3 for UFLP).
+ * @return A unique pointer to the created ProblemSolver.
+ * @throws std::invalid_argument if the problem type is not recognized.
+ */
 std::unique_ptr<ProblemSolver> CreateProblemSolver(int problem) {
     switch (problem) {
         case 1:
@@ -96,10 +121,16 @@ std::unique_ptr<ProblemSolver> CreateProblemSolver(int problem) {
         case 3:
             return std::make_unique<UFLPSolver>();
         default:
-            throw std::invalid_argument("Tipo di problema non valido in CreateProblemSolver");
+            throw std::invalid_argument("Non valid problem in CreateProblemSolver");
     }
 }
 
+/**
+ * @brief Checks if the provided filename corresponds to the expected instance type for the current problem.
+ * @param currentProblem The currently selected problem (1 for AP, 2 for GAP, 3 for UFLP).
+ * @param filename The name of the file to check.
+ * @return true if the file is valid for the current problem, false otherwise.
+ */
 bool checkIfRightInstance(const int& currentProblem, std::string& filename) {
     if (filename.empty()) return false;
 
@@ -119,7 +150,9 @@ bool checkIfRightInstance(const int& currentProblem, std::string& filename) {
     }
 }
 
-
+/// ***************************************************************************
+/// *                             Main Function                               *
+/// ***************************************************************************
 int main() {
     int currentProblem = 0, running = 1;
     std::unique_ptr<ProblemInstance> instance;
