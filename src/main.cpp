@@ -34,7 +34,7 @@ void printMainMenu() {
 
 /**
  * @brief Reads an integer from the standard input, ensuring that is valid.
- * @details This function will keep prompting the user until a valid integer is entered.ADJ_OFFSET_SINGLESHOT
+ * @details This function will keep prompting the user until a valid integer is entered.
  * @return The valid integer input from the user.
  */
 int safeReadInt() {
