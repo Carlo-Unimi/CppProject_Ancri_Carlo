@@ -48,7 +48,7 @@ public:
     void computeCost(const std::vector<std::vector<int>>& costMatrix);
 
     /**
-     * @brief Gets the total cost (from APSolution::computeCost) of the assignment.
+     * @brief Gets the total cost (claculated by APSolution::computeCost) of the assignment.
      * @return The total cost of the assignment.
      */
     int getTotalCost() const;
