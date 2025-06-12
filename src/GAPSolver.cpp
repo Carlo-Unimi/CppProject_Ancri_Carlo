@@ -12,7 +12,7 @@
 std::unique_ptr<ProblemSolution> GAPSolver::solve(const ProblemInstance* instance) {
     const GAPInstance* gapInst = dynamic_cast<const GAPInstance*>(instance);
     if (!gapInst)
-        throw std::invalid_argument("GAPSolver::solve richiede un GAPInstance valido");
+        throw std::invalid_argument("GAPSolver:: solve requires a GAPInstance");
 
     int m = gapInst->getNumAgents();
     int n = gapInst->getNumTasks();
@@ -73,7 +73,7 @@ std::unique_ptr<ProblemSolution> GAPSolver::solve(const ProblemInstance* instanc
     // check if all tasks are assigned
     for (int j = 0; j < n; ++j) {
         if (assignment[j] == -1)
-            throw std::runtime_error("GAPSolver::solve: errore interno - task non assegnato");
+            throw std::runtime_error("GAPSolver::solve: not all tasks assigned");
     }
     
     auto solution = std::make_unique<GAPSolution>();
