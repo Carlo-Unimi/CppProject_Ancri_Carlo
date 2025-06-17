@@ -22,7 +22,6 @@ const std::vector<int>& UFLPSolution::getAssignment() const {
 void UFLPSolution::computeCost(
     const std::vector<int>& openingCost,
     const std::vector<std::vector<int>>& serviceCost) {
-    totalCost = 0;
     for (size_t i = 0; i < openFacilities.size(); ++i) {
         if (openFacilities[i]) totalCost += openingCost[i];
     }
