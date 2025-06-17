@@ -71,6 +71,8 @@ void clearScreen(int seconds) {
  * @param problem The type of problem (1 for AP, 2 for GAP, 3 for UFLP).
  * @param filename The name of the file containing the instance data.
  * @return A unique pointer to the created ProblemInstance, or nullptr if an error occurs.
+ * 
+ * @throws std::runtime_error if the file cannot be opened or if the data is invalid.
  */
 std::unique_ptr<ProblemInstance> CreateProblemInstance(int problem, const std::string& filename) {
     std::unique_ptr<ProblemInstance> instance;
