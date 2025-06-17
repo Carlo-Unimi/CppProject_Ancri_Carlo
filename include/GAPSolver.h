@@ -19,6 +19,8 @@ public:
      * - If no agent has enough residual capacity, it chooses the agent with the leas capacity overflow (as a fallback); then it updates the residual capacities of the agents.
      * - After attempting to assign all tasks, it checks if all tasks have been assigned; if not, throws a runtime error.
      * - Once all tasks are assigned, it computes the total resources used and the total cost of the assignment and builds a GAPSolution object. (It sets the assignment, computes resources and cost, and returns it.)
+     * 
+     * @throws std::runtime_error if not all tasks can be assigned to agents.
      */
     std::unique_ptr<ProblemSolution> solve(const ProblemInstance* instance) override;
 };
