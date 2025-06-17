@@ -15,3 +15,4 @@ A `Makefile` is included to simplify compilation and project management.
 ### Build the project
 ```bash
 make
+./project
