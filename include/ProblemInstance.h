@@ -3,6 +3,13 @@
 
 #include <string>
 
+/**
+ * @file ProblemInstance.h
+ * @brief Declaration of the ProblemInstance class, which represents a problem instance to be solved.
+ *
+ * The ProblemInstance class serves as an abstract base for all problem-specific input data structures. It defines the interface for loading and accessing information about a particular optimization problem instance, sush as cost matrices, capacity constraints, or resource requirements.
+ * Each subclass extends this insteface to handle its own data format and logic for parsing files.
+ */
 class ProblemInstance {
 public:
 

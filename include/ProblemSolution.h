@@ -4,6 +4,13 @@
 #include <ostream>
 #include <string>
 
+/**
+ * @file ProblemSolution.h
+ * @brief Declaration of the ProblemSolution class, which represents a solution to a problem instance.
+ *
+ * The ProblemSolution class is the abstract base that encapsulates the output of a solver. It holds the final decisions made by the algorithm—such as task assignments, facility openings, or resource usages—and provides methods for evaluating their cost or validity.
+ * Derived classes like APSolution, GAPSolution, and UFLPSolution implement problem-specific logic to compute objective values and display results in a readable format.
+ */
 class ProblemSolution {
 protected:
     /**

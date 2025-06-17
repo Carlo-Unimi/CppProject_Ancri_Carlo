@@ -1,4 +1,3 @@
-// include/ProblemSolver.h
 #ifndef PROBLEMSOLVER_H
 #define PROBLEMSOLVER_H
 
@@ -6,6 +5,13 @@
 #include "ProblemSolution.h"
 #include <memory>
 
+/**
+ * @file ProblemSolver.h
+ * @brief Declaration of the ProblemSolver class, which is responsible for solving problem instances.
+ *
+ * The ProblemSolver class defines the general interface for any algorithm or heuristic designed to solve a given optimization problem. It takes a ProblemInstance as input and produces a ProblemSolution.
+ * Concrete implementations (such as APSolver, GAPSolver, UFLPSolver) encapsulate the logic required to compute feasible or optimal assignments based on the structure of the specific problem.
+ */
 class ProblemSolver {
 public:
 
