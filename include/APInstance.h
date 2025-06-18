@@ -7,7 +7,7 @@
 class APInstance : public ProblemInstance {
 private:
 
-    std::vector<std::vector<int>> costMatrix; // Cost matrix representing the costs associated with each agent and task
+    std::vector<std::vector<int>> costMatrix; // Cost matrix represent the costs associated with each agent and task
     int numAgents; // Number of agents in the problem instance
 
 public:
