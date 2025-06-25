@@ -12,7 +12,6 @@ const std::vector<int>& APSolution::getAssignment() const {
 }
 
 void APSolution::computeCost(const std::vector<std::vector<int>>& costMatrix) {
-    totalCost = 0;
     for (size_t i = 0; i < assignment.size(); ++i) {
         totalCost += costMatrix[i][assignment[i]];
     }

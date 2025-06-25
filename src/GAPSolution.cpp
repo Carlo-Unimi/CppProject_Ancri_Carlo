@@ -4,7 +4,6 @@
 GAPSolution::GAPSolution() : totalCost(0) {}
 
 void GAPSolution::computeResourcesAndCost(const std::vector<std::vector<int>>& cost, const std::vector<std::vector<int>>& resource) {
-    totalCost = 0;
     capacityUsed.assign(resource.size(), 0);
     for (size_t j = 0; j < assignment.size(); ++j) {
         int agent = assignment[j];
