@@ -5,7 +5,7 @@ This project provides solvers for various combinatorial optimization problems:
 - **GAP** — Generalized Assignment Problem
 - **UFLP** — Uncapacitated Facility Location Problem
 
-The project is written in C++ and structured modularly with separate source (`src/`) and header (`include/`) files.
+The project is written in C++ and structured modularly with separate source (`src`) and header (`include`) files.
 
 ---
 
